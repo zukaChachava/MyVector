@@ -14,7 +14,7 @@ public:
     MyVector(){
         _size = 0;
         _capacity = CAPACITY;
-        _data = new T[CAPACITY];
+        _data = (T*)::operator new(CAPACITY * sizeof(T)); // creates space without calling constructor -> malloc
     }
 
     size_t Size() const{
@@ -51,7 +51,6 @@ public:
         if(_size == _capacity)
             Resize();
 
-        //_data[_size] = T(std::forward<Args>(args)...); // need move
         new(&_data[_size]) T(std::forward<Args>(args)...); // does not need move
         return _data[_size++];
     }
@@ -64,23 +63,32 @@ public:
     }
 
     void Clear(){
-        delete[] _data;
+        InnerClear();
         _size = 0;
-        _data = new T[4];
     }
 
 private:
+    void InnerClear(){
+        for(int i = 0; i < _size; i++)
+            _data[i].~T();
+    }
+
     void Resize(){
         T* new_data = new T[_capacity * INCREMENT];
+
         for(int i = 0; i < _size; i++)
             new_data[i] = std::move(_data[i]);
-        delete[] _data;
+
+        InnerClear();
+
+        ::operator delete(_data, _capacity * sizeof(T));
         _data = new_data;
         _capacity *= 2;
     }
 
 public:
     ~MyVector(){
-        delete[] _data;
+        InnerClear();
+        ::operator delete(_data, _capacity * sizeof(T)); // deletes space without calling destructor
     }
 };

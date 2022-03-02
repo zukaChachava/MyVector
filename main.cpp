@@ -4,7 +4,9 @@
 struct ZPoint{
     int index, x, y;
 
-    ZPoint() {}
+    ZPoint() {
+        std::cout << "Created" << std::endl;
+    }
 
     ZPoint(int index, int x_point, int y_point): index(std::move(index)), x(std::move(x_point)), y(std::move(y_point)){
         std::cout << "Create with parameters index -> " << index << std::endl;
@@ -47,21 +49,16 @@ int main() {
 
     //Move
     for(int i = 1; i < 3; i++){
-        std::cout << "LOOP ---- " << std::endl;
         points.EmplaceBack(i, i, i + 1);
-        std::cout << "LOOP ---- END\n" << std::endl;
     }
-    std::cout << "------------" << std::endl;
 
     // Copy
-    ZPoint point(100, 5, 5);
-    points.PushBack(point);
-
     std::cout << "------------" << std::endl;
-
-    std::cout << "Clearing . . . " << std::endl;
-    points.Clear();
-    std::cout << "Cleared " << std::endl;
+    {
+        ZPoint point(100, 5, 5);
+        points.PushBack(point);
+    }
+    std::cout << "------------" << std::endl;
 
     for(int i = 0; i < points.Size(); i++)
         points[i].Print();
