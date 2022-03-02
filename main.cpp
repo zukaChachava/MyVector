@@ -48,7 +48,7 @@ int main() {
     MyVector<ZPoint> points;
 
     //Move
-    for(int i = 1; i < 3; i++){
+    for(int i = 1; i < 8; i++){
         points.EmplaceBack(i, i, i + 1);
     }
 

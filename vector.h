@@ -3,6 +3,58 @@
 #define INCREMENT 2
 #define CAPACITY 4
 
+template<typename MyVector, typename ValueType>
+class MyVectorIterator{
+private:
+    ValueType* _pointer;
+
+public:
+    MyVectorIterator(ValueType* pointer): _pointer(std::move(pointer)){}
+
+    MyVectorIterator& operator++(){
+        _pointer++;
+        return *this;
+    }
+
+    MyVectorIterator<MyVector, ValueType> operator++(int){
+        MyVectorIterator<MyVector, ValueType> myVectorIterator = *this;
+        ++(*_pointer);
+        return myVectorIterator;
+    }
+
+    MyVectorIterator<MyVector, ValueType>& operator--(){
+        _pointer--;
+        return *this;
+    }
+
+    MyVectorIterator<MyVector, ValueType> operator--(int){
+        MyVectorIterator<MyVector, ValueType> myVectorIterator = *this;
+        --(*_pointer);
+        return myVectorIterator;
+    }
+
+    ValueType& operator[](int index){
+        return *(_pointer + index);
+    }
+
+    ValueType* operator->(){
+        return _pointer;
+    }
+
+    ValueType& operator*(){
+        return &_pointer;
+    }
+
+    bool operator==(const MyVectorIterator<MyVector, ValueType>& other) const{
+        return _pointer == other._pointer;
+    }
+
+    bool operator!=(const MyVectorIterator<MyVector, ValueType>& other) const{
+        return !(*this == other);
+    }
+};
+
+
 template<typename T>
 class MyVector{
 private:
@@ -67,6 +119,14 @@ public:
         _size = 0;
     }
 
+    MyVectorIterator<MyVector, T> begin(){
+        return MyVectorIterator<MyVector, T>(&_data[0]);
+    }
+
+    MyVectorIterator<MyVector, T> end(){
+        return MyVectorIterator<MyVector, T>(_data + _size);
+    }
+
 private:
     void InnerClear(){
         for(int i = 0; i < _size; i++)
@@ -74,7 +134,7 @@ private:
     }
 
     void Resize(){
-        T* new_data = new T[_capacity * INCREMENT];
+        T* new_data = (T*)::operator new(_capacity * INCREMENT * sizeof(T));
 
         for(int i = 0; i < _size; i++)
             new_data[i] = std::move(_data[i]);
@@ -92,3 +152,4 @@ public:
         ::operator delete(_data, _capacity * sizeof(T)); // deletes space without calling destructor
     }
 };
+
